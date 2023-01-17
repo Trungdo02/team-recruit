@@ -25,7 +25,7 @@ Ném vào IDA tớ phát hiện phần còn lại
 ## Cat
 ![cat1](cat1.png)
 
-Vẫn được phát cho 1 `file binary`
+Vẫn được phát cho một **file binary**
 
     trungdo@TEFO:/mnt/c/ctf/kcsc/cat$ file cat
     cat: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=4f771cfd97efdbadc12e89fe42513cb94da5a7e8, for GNU/Linux 3.2.0, not stripped
@@ -114,7 +114,7 @@ con.interactive()
 
 Yeah sure chắc chắn là như vậy rồi =))
 `flag: KCSC{w3ll_d0n3_y0u_g0t_my_s3cr3t_n0w_d04942f299}`
-## Over the write
+## OverTheWrite
 ![otf1](otf1.png)
 
 Vẫn là 1 `file binary`. Dow về thôi
@@ -213,6 +213,10 @@ p.interactive()
 
 ```
 Lúc đầu tớ thêm `b"A"` thay vì `/0` vào `s1` nên chạy nó cứ bị sai =))
+
+![otw6](otw6.png)
+
+`flag: KCSC{y0ur_wr1t3_g4v3_y0u_th1s_fl4g_afc4185ea6}`
 
 ## ShortJumps
 _*Chall này tớ làm mãi mà không xong, hết thời gian thì lại solve được T.T_
