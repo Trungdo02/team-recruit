@@ -1,6 +1,16 @@
-# kcsc ctf recruit member
+#  Lê Đức Trung Đô writeup KCSC ctf member recruit
 _Mình chuẩn bị không kỹ càng lắm nên giải được ít bài =((_
-## Treasure
+
+- [Lê Đức Trung Đô writeup KCSC ctf member recruit](#lê-đức-trung-đô-writeup-kcsc-ctf-member-recruit)
+  - [**Treasure**](#treasure)
+  - [**Cat**](#cat)
+  - [**OverTheWrite**](#overthewrite)
+  - [**ShortJumps**](#shortjumps)
+
+---
+
+## **Treasure**
+
 ![treasure1](treasure1.png)
 
 Ta được phát 1 file như này
@@ -22,7 +32,10 @@ Ném vào IDA tớ phát hiện phần còn lại
 ![treasure2](treasure2.png)
 
 `flag : KCSC{4_t1ny_tr34sur3_27651d2df78e1998}`
-## Cat
+
+---
+
+## **Cat**
 ![cat1](cat1.png)
 
 Vẫn được phát cho một **file binary**
@@ -57,38 +70,31 @@ Tạo fake flag debug thử coi
 
     trungdo@TEFO:/mnt/c/ctf/kcsc/cat$ echo "fake flag" > flag.txt
     trungdo@TEFO:/mnt/c/ctf/kcsc/cat$ gdb cat
-Ném vào `IDA` tớ thấy nó đọc **512** byte nên cho nó **600** byte thử
-```c
-int __cdecl main(int argc, const char **argv, const char **envp)
-{
-  int v4; // [rsp+Ch] [rbp-4h]
-  int v5; // [rsp+Ch] [rbp-4h]
 
-  init();
-  read_flag();
-  printf("Username: ");
-  v4 = read(0, username, 0x20uLL);
-  if ( username[v4 - 1] == 10 )
-    username[v4 - 1] = 0;
-  printf("Password: ");
-  v5 = read(0, password, 0x20uLL);
-  if ( password[v5 - 1] == 10 )
-    password[v5 - 1] = 0;
-  if ( !strcmp(username, "KCSC_4dm1n1str4t0r") && !strcmp(password, passwd) )
-  {
-    puts("Logged in!");
-    printf("Your secret: ");
-    read(0, secret, 512uLL);
-    printf("Saving secret \"%s\"...\n", secret);
-    puts("Done! Exiting...");
-  }
-  else
-  {
-    puts("Unauthorized access is forbidden!");
-  }
-  return 0;
-}
-```
+![cat9](cat9.png)
+
+Đặt breakpoint lúc đọc secret mà nó k cho mn ạ :((
+
+![cat10](cat10.png)
+
+Run rồi nhập `username` và `password` vào sau đó interupt nó để có thể check các `register`
+
+![cat7](cat8.png)
+
+không có gì có hot cả.
+
+![cat11](cat11.png)
+
+Độ lớn của secret là 512 byte được push vào stack, và secret của ta đang nằm ở rsi
+
+Check các string trong $rsi
+
+    gdb-peda$ x/600s $rsi
+
+![cat7](cat7.png)
+
+`flag` cũng đang nằm trong này và nằm ngay sau `secret`. Vậy chỉ cần ta cho nó input đủ lớn thì có thể **overwrite** được ký tự `\0` và `flag` sẽ được in ra ngoài kèm với `secret` của mình
+
 ![cat4](cat4.png)
 
 Ố ồ xem chúng ta có gì nào. Đoạn cuối chính là `fake flag` mình vừa tạo ban nãy
@@ -114,7 +120,9 @@ con.interactive()
 
 Yeah sure chắc chắn là như vậy rồi =))
 `flag: KCSC{w3ll_d0n3_y0u_g0t_my_s3cr3t_n0w_d04942f299}`
-## OverTheWrite
+
+---
+## **OverTheWrite**
 ![otf1](otf1.png)
 
 Vẫn là 1 `file binary`. Dow về thôi
@@ -188,6 +196,9 @@ Khi chương trình chạy `stack` sẽ trông dư lày:
 ![otw4](otw4.png)
 
 **Exploit**
+Đầu tiên là `buff[4]` gồm 32 byte, tiếp đến là `s1` được thêm `/0` và đuôi tổng 16 byte, kế đến lần lượt là `v6`, `v7`, `v8` cuối cùng là `v9`. Vậy là đủ 80 byte rồi. `v9` có thể `p64(v9)` hoặc `b"A"*4 + p32(v9)` như tớ làm đều được, do `v9` chỉ có 4byte nên mình phải thêm mấy byte vào trước cho nó đầy
+
+
 ```python
 from pwn import *
 v9 = 0x13371337
@@ -218,8 +229,10 @@ Lúc đầu tớ thêm `b"A"` thay vì `/0` vào `s1` nên chạy nó cứ bị 
 
 `flag: KCSC{y0ur_wr1t3_g4v3_y0u_th1s_fl4g_afc4185ea6}`
 
-## ShortJumps
-_*Chall này tớ làm mãi mà không xong, hết thời gian thì lại solve được T.T_
+---
+## **ShortJumps**
+_*Chall này tớ làm chưa xong, hết thời gian thì lại solve được T.T_
+
 ![sj1](sj1.png)
 
 Lần này `author` tốt bụng cho cả source code nên không cần dùng tools xem `pseudocode` =))
@@ -227,6 +240,7 @@ Lần này `author` tốt bụng cho cả source code nên không cần dùng to
     trungdo@TEFO:/mnt/c/ctf/kcsc/shortjump$ file shortjumps
     shortjumps: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=9533ce74d3e3b2f97fac5a561b6692944c3f0d59, for GNU/Linux 3.2.0, not stripped
     trungdo@TEFO:/mnt/c/ctf/kcsc/shortjump$ strings shortjumps
+
 Chưa thấy gì đặc biệt lắm
 Nghía thử `source code` coi
 
@@ -299,17 +313,20 @@ int main()
 **Suy nghĩ 1 chút...**
 
 Ta có 2 mảng **char** `name[32]` và `dream[80]`. `dream` chỉ có **80 byte** nhưng func `scanf` lại có thể nhận tới **140 byte** -> buffer overflow. Hơn nữa, tớ thấy func `jmp2` đang chứa `shell`, nên chắc ta phải return luồng thực thi của mình về đó, nhưng chỉ jump tới `jump2` thì sẽ fail bởi điều kiện `if`. Ta bypass nó bằng cách jump tới `jmp1` trước sau đó mới jump tới `jmp2`
-**Stack của một `function`**
+
+**Stack**
+
 ![sj2](sj2.png)
 
-Có thể thấy khi một function được gọi, `return address` sẽ được `push` vào trước và tiếp theo đó là các `arg` của nó sẽ lần lượt được đưa vào `stack`
+Có thể thấy khi một function được thực thi, `return address` sẽ được `push` vào trước và tiếp theo đó là các `arg` của nó sẽ lần lượt được đưa vào `stack`
 
 Vậy khi ta muốn jump đến func nào thì bắt buộc phải overwrite lại `retAdd` và các `arg` của ló
 
-Một điều kiện tiên quyết quyết định ta có thể `jump` được hay không, đó chính là `control EIP`. Dùng `GDB` để kiểm tra.
+Một điều kiện tiên quyết quyết định ta có thể `jump` được hay không, đó chính là `control EIP`. Ở đây tớ dùng `GDB` để kiểm tra.
+
 ![sj3](sj3.png)
 
-Dùng `gdb` tạo ra 1 pattern dài 200 byte rồi `put` vào `dream`, `eip` đã hoàn toàn bị `overwrite`. Vì vậy ta có thể điều khiển chương trình đi đến đâu tùy ý 
+Dùng `gdb` tạo ra 1 pattern dài **200 byte** rồi `put` vào `dream`, `eip` đã hoàn toàn bị `overwrite`. Vì vậy ta có thể điều khiển chương trình đi đến đâu tùy ý 
 
     gdb-peda$ checksec
     CANARY    : disabled
@@ -317,10 +334,12 @@ Dùng `gdb` tạo ra 1 pattern dài 200 byte rồi `put` vào `dream`, `eip` đ�
     NX        : ENABLED
     PIE       : disabled
     RELRO     : Partial
+
 `NX` _enable_ nên ta không thể chèn shellcode vào được. Chỉ còn 1 cách là jump thôi =)))
 
     gdb-peda$ pattern offset $eip
     1095713089 found at offset: 124
+
 Search offset của pattern `eip` đang bị overwrite ta được offset để overwrite `eip` là `124` đi sau đó là địa chỉ của `jm1`. `PIE` _disable_ nên lấy func addr rất đơn giản
 
     gdb-peda$ p jmp1 
@@ -329,11 +348,13 @@ Search offset của pattern `eip` đang bị overwrite ta được offset để 
     $4 = {<text variable, no debug info>} 0x80492e0 <jmp2> #địa chỉ của jmp2 là 0x80492e0
 
 Tiếp theo là `retAdd` và các `arguments`. `RetAdd` tớ sẽ để nó là địa chỉ của `jmp2` luôn. Sau đó sẽ `overwrite` lại `retAdd` của `jmp2` và `push` các đối số của nó vào.
+
 Tới đây lại phát sinh vấn đề. `a + b = 0x13371337` mà `a = 0xcafebabe` nên chắc chắn `b` sẽ âm, ta không thể biểu diễn hex âm được nên tớ chọn cách dùng số bù 1 thì được `b = 0x48385879`.
 
 ![otw5](otw5.png)
 
- Tớ nhận được 1 hint siêu to khổng lồ của `author` là _integer overflow_. Làm tràn số đến byte thứ 9 nhưng bộ nhớ chỉ lấy 4byte int nên sẽ có thế bypass được. Ta sẽ làm cho `a + b` tràn đến byte số 9 bằng cách `a + b = 0x113371337` => `b = 0x48385879`
+ Tớ nhận được 1 hint siêu to khổng lồ của `author` là _integer overflow_. Làm tràn số đến byte thứ 9 nhưng thanh ghi chỉ lấy 8byte do đó byte dư sẽ bị loại ra mất nên sẽ có thế bypass được. Ta sẽ làm cho `a + b` tràn đến byte số 9 bằng cách `a + b = 0x113371337` (vì stack có cấu trúc theo kiểu little endian nên phải chèn số ở trước chứ k phải ở sau )  => `b = 0x48385879`
+
 **Đầy đủ nguyên liệu rồi viết script exploit thôi**
 
 ```python
